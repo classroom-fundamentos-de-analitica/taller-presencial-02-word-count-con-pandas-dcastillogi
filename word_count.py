@@ -47,21 +47,24 @@ def clean_text(dataframe):
 def count_words(dataframe):
     """Word count"""
     # TRUCO: Convertir el texto en una lista de palabras en cada fila
-    dataframe["word"] = dataframe["word"].str.split()
-    
-    dataframe["word"] = dataframe.explode("word").reset_index(drop=True)
+    dataframe = dataframe.copy()
+    dataframe['word'] = dataframe['word'].str.split()
+    dataframe = dataframe.explode('word').reset_index(drop=True)
+    dataframe['count'] = 1
 
-    dataframe["count"] = 1
+    conteo = dataframe.groupby(['word'], as_index=False).agg(
+        {
+            'count': "sum"
+        }
+    )
+    return conteo 
 
-    dataframe = dataframe.groupby(["word"]).agg({"count": "sum"})
-
-    return dataframe
 
 
 def save_output(dataframe, output_filename):
     """Save output to a file."""
 
-    dataframe.to_csv(output_filename)
+    dataframe.to_csv(output_filename, index=False)
 
 
 #
